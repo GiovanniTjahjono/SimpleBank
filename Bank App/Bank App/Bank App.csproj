@@ -6,8 +6,4 @@
     <RootNamespace>Bank_App</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Accounts\" />
-  </ItemGroup>
-
 </Project>

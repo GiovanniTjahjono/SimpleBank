@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+vZOuzV2+Ee3O15Hvb5nKlWWF//5dRoPdkeogqY8lNLXKNqMkttVRGGCljb+LE6rVULeluxK3YrUCFo4exRMiA==",
+  "dgSpecHash": "8wliQ4egK1pUkneQe8GxDPuDuS170lY2LdjDcZH+q0o+vuyPA9UxMYZZXjjBb+bIheM/SOWa1TGx1lgIhUVHHQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\ivank\\source\\repos\\Bank App\\Bank App\\Bank App.csproj",
+  "projectFilePath": "C:\\Users\\ivank\\source\\repos\\SimpleBank\\Bank App\\Bank App\\Bank App.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

@@ -7,8 +7,7 @@ namespace Bank_App
         static void Main(string[] args)
         {
             bool credentialIsValid = false;
-            Account newA = new Account();
-            newA.CreateNewAccount();
+          
             while(!credentialIsValid)
             {
                 Console.Clear();
@@ -132,10 +131,11 @@ namespace Bank_App
                     }
                 }
 
+                Account account = new Account();
                 switch (menuChoice)
                 {
                     case 1:
-                        Console.WriteLine("1");
+                        account.CreateNewAccount();
                         break;
                     case 7:
                         isActive = false;

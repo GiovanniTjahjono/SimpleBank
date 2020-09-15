@@ -1,0 +1,7 @@
+Firstname|Giovanni
+Lastname|Tjahjono
+Address|352 Sussex st.
+Phone|82671672
+Email|ivangiovn@gmail.com
+AccountNo|82703472
+Balance|0

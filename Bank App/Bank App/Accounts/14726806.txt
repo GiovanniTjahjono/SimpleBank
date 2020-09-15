@@ -1,0 +1,7 @@
+Firstname|Ivan
+Lastname|Brown
+Address|Kent st
+Phone|92178329
+Email|kent@gmail.com
+AccountNo|14726806
+Balance|0

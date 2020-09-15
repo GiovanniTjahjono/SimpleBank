@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ivank\\source\\repos\\Bank App\\Bank App\\Bank App.csproj",
+      "projectUniqueName": "C:\\Users\\ivank\\source\\repos\\SimpleBank\\Bank App\\Bank App\\Bank App.csproj",
       "projectName": "Bank App",
-      "projectPath": "C:\\Users\\ivank\\source\\repos\\Bank App\\Bank App\\Bank App.csproj",
+      "projectPath": "C:\\Users\\ivank\\source\\repos\\SimpleBank\\Bank App\\Bank App\\Bank App.csproj",
       "packagesPath": "C:\\Users\\ivank\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ivank\\source\\repos\\Bank App\\Bank App\\obj\\",
+      "outputPath": "C:\\Users\\ivank\\source\\repos\\SimpleBank\\Bank App\\Bank App\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ivank\\AppData\\Roaming\\NuGet\\NuGet.Config",

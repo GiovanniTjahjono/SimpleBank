@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Bank_App
@@ -20,6 +21,29 @@ namespace Bank_App
         public int Phone { get => phone; set => phone = value; }
         public string Email { get => email; set => email = value; }
 
+        public string GenerateUniqueAccountNumber()
+        {
+            Random random = new Random();
+            string accountNumber = "";
+            bool accountNumberIsValid = false;
+            while(!accountNumberIsValid)
+            {
+                accountNumber = "";
+                for (int i = 0; i < 8; i++)
+                {
+                    accountNumber += random.Next(0, 9);
+                }
+                if(File.Exists("../../../Accounts/" + accountNumber + ".txt"))
+                {
+                    continue;
+                } else
+                {
+                    accountNumberIsValid = true;
+                }
+            }
+            
+            return accountNumber;
+        }
         public void CreateNewAccount()
         {
             bool isValid = false;
@@ -126,6 +150,34 @@ namespace Bank_App
                     {
                         isCorrect = true;
                         isValid = true;
+                        
+                        string accountNumber = GenerateUniqueAccountNumber();
+                        try
+                        {
+                            File.WriteAllText("../../../Accounts/"+accountNumber + ".txt", "Firstname|" + Firstname + "\n" +
+                                                        "Lastname|" + Lastname + "\n" +
+                                                        "Address|" + Address + "\n" +
+                                                        "Phone|" + Phone + "\n" +
+                                                        "Email|" + Email + "\n" +
+                                                        "AccountNo|" + accountNumber + "\n" +
+                                                        "Balance|0" + "\n");
+                        } catch(IOException e)
+                        {
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.Write(e.Message);
+                        }
+                        Console.SetCursorPosition(messageCursorY, messageCursorX);
+                        Console.Write(new string(' ', Console.WindowWidth));
+                        Console.SetCursorPosition(messageCursorY, messageCursorX);
+                        Console.Write("Account is created, check email for the detail");
+                        Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                        Console.Write(new string(' ', Console.WindowWidth));
+                        Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                        Console.Write("Account number is " + accountNumber);
+
+                        Console.ReadLine();
                     } else if (confirm.ToLower() == "n")
                     {
                         isCorrect = true;
@@ -137,7 +189,7 @@ namespace Bank_App
                         Console.WriteLine("Press any key to try again");
                         Console.ReadKey();
                         Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
-                        Console.Write(new string(' ', Console.WindowWidth - 1));
+                        Console.Write(new string(' ', Console.WindowWidth));
                         Console.SetCursorPosition(messageCursorY, messageCursorX);
                         Console.Write(new string(' ', Console.WindowWidth));
                         continue;
