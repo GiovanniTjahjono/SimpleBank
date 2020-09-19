@@ -1,0 +1,7 @@
+Firstname|Giovanni
+Lastname|Tjahjono
+Address|UTS Building 10, Sydney, NSW
+Phone|4268920
+Email|ivangiovn@gmail.com
+AccountNo|55146584
+Balance|0

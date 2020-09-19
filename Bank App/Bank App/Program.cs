@@ -7,8 +7,9 @@ namespace Bank_App
         static void Main(string[] args)
         {
             bool credentialIsValid = false;
-          
-            while(!credentialIsValid)
+            Account a = new Account();
+            a.AccountStatement();
+            while (!credentialIsValid)
             {
                 Console.Clear();
                 Console.WriteLine("\t ====================================================");
@@ -67,6 +68,7 @@ namespace Bank_App
         }
         static void MainMenu(string usernameLoginUser)
         {
+            
             bool isActive = true;
             while (isActive)
             {
@@ -136,6 +138,20 @@ namespace Bank_App
                 {
                     case 1:
                         account.CreateNewAccount();
+                        break;
+                    case 2:
+                        account.SearchAnAccount();
+                        break;
+                    case 3:
+                        account.Deposit();
+                        break;
+                    case 4:
+                        account.Withdrawal();
+                        break;
+                    case 5:
+                        account.AccountStatement();
+                        break;
+                    case 6:
                         break;
                     case 7:
                         isActive = false;
