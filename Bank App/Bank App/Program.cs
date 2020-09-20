@@ -6,9 +6,11 @@ namespace Bank_App
     {
         static void Main(string[] args)
         {
+            //--While the app is active, always show it
             bool credentialIsValid = false;
             while (!credentialIsValid)
             {
+                //--Show the user interface
                 Console.Clear();
                 Console.WriteLine("\t ====================================================");
                 Console.WriteLine("\t |                                                  |");
@@ -38,30 +40,33 @@ namespace Bank_App
                 String password = "";
                 char passwordChar = '*';
                 bool isEnter = false;
+                //--Change the input password with *
                 while(!isEnter)
                 {
                     var key = Console.ReadKey(intercept: true);
+                    //--If the input is backspace, delete a character
                     if(key.Key == ConsoleKey.Backspace && password.Length > 0)
                     {
                         Console.Write("\b \b");
                         password = password[0..^1];
                     }
+                    //--If the input is not part of the control button, assign the value
                     if(!char.IsControl(key.KeyChar))
                     {
                         Console.Write(passwordChar);
                         password += key.KeyChar;
                     }
+                    //--If the input is enter, go to the next operation
                     if(key.Key == ConsoleKey.Enter)
                     {
                         isEnter = true;
                     }
                 }
 
-                
-
                 Console.SetCursorPosition(endlineCursorY, endlineCursorX);
-
+                //--Declare the class
                 User user = new User(username, password);
+                //--Check, is the user valid
                 if (user.CheckCredential())
                 {
                     Console.WriteLine("\t |                                                  |");
@@ -73,6 +78,7 @@ namespace Bank_App
                     Console.ReadKey();
                     MainMenu(user.Username);
                 }
+                //--If not valid, show the message
                 else
                 {
                     Console.WriteLine("\t |                                                  |");
@@ -84,18 +90,21 @@ namespace Bank_App
                 }
             }
         }
+        //--Main Menu
         static void MainMenu(string usernameLoginUser)
         {
-            
+            //--Show the main menu as long as it is active
             bool isActive = true;
             while (isActive)
             {
+                //--Adjust the width of the screen
                 int menuChoice = 0;
                 int lineBeforeAndAfterGreeting = (52 - (usernameLoginUser.Length + 4)) / 2 - 1;
                 int lineSpaceLeft = 52 - ((lineBeforeAndAfterGreeting * 2) + (usernameLoginUser.Length + 4 + 2));
-
+                //--While is active
                 while (isActive)
                 {
+                    //--Show the menu
                     Console.Clear();
                     Console.WriteLine("\t ====================================================");
                     Console.WriteLine("\t |                                                  |");
@@ -137,11 +146,15 @@ namespace Bank_App
                     Console.WriteLine("                                               |");
                     Console.WriteLine("\t ====================================================");
                     Console.SetCursorPosition(choiceCursorY, choiceCursorX);
+                    //--Get the user input
                     string inputChoice = Console.ReadLine();
+                    //--Check, is the user input is numeric
                     if (int.TryParse(inputChoice, out menuChoice))
                     {
+                        //--Check, is the user input is between 1 -7
                         if (menuChoice <= 7 && menuChoice >= 1)
                         {
+                            //--Declare the account class
                             Account account = new Account();
                             switch (menuChoice)
                             {
@@ -171,6 +184,7 @@ namespace Bank_App
                                     break;
                             }
                         }
+                        //--If the input is not between 1 - 7, show message
                         else
                         {
                             Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -180,6 +194,7 @@ namespace Bank_App
                             Console.ReadKey();
                         }
                     }
+                    //--If the input is not between 1 - 7, show message
                     else
                     {
                         Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -189,8 +204,6 @@ namespace Bank_App
                         Console.ReadKey();
                     }
                 }
-
-               
             }
         }
     }

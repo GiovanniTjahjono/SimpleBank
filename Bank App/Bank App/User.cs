@@ -7,21 +7,24 @@ namespace Bank_App
 {
     class User
     {
+        //--Declare the class properties
         private string username, password;
-
+        //--Create the class contructor
         public User(string username, string password)
         {
             this.Username = username;
             this.Password = password;
         }
-
+        //--Create getter and setter
         public string Username { get => username; set => username = value; }
         public string Password { get => password; set => password = value; }
 
+        //--Check the credential
         public bool CheckCredential()
         {
             bool isValid = false;
             string savedUsername, savedPassword;
+            //--Try to read the file
             try
             {
                 StreamReader loginPool = new StreamReader("../../../login.txt");
@@ -31,7 +34,7 @@ namespace Bank_App
                     string[] dataRow = data.Split('|');
                     savedUsername = dataRow[0];
                     savedPassword = dataRow[1];
-                    
+                    //--If the username and password is match, return true
                     if(savedUsername == this.Username && savedPassword == this.Password)
                     {
                         isValid = true;
@@ -44,6 +47,7 @@ namespace Bank_App
             {
                 Console.WriteLine(e.Message);
             }
+            //--Return the result
             return isValid;
         }
     }
