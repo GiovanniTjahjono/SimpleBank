@@ -4,7 +4,7 @@ Address|352 Sussex st.
 Phone|82671672
 Email|ivangiovn@gmail.com
 AccountNo|82703472
-Balance|155
+Balance|832
 01/01/0001 08:00:00|Deposit|1000|1000
 01/01/0001 08:00:00|Deposit|2100|3100
 18/09/2020 16:13:16|Deposit|120|3220
@@ -24,3 +24,5 @@ Balance|155
 19/09/2020 14:15:46|Withdrawal|5|145
 19/09/2020 14:18:15|Withdrawal|5|140
 19/09/2020 14:18:47|Deposit|15|155
+20/09/2020 18:40:58|Deposit|777|932
+20/09/2020 18:41:23|Withdrawal|100|832

@@ -398,9 +398,11 @@ namespace Bank_App
         //--Search an account
         public void SearchAnAccount()
         {
+            //--as long as isValid active, means show the search an account menu
             bool isValid = false;
             while (!isValid)
             {
+                //--Show user interface
                 Console.Clear();
                 Console.WriteLine("\t ====================================================");
                 Console.WriteLine("\t |                                                  |");
@@ -428,12 +430,15 @@ namespace Bank_App
                 Console.SetCursorPosition(accountNumberCursorY, accountNumberCursorX);
                 string accountNumber = Console.ReadLine();
                 int result = 0;
+                //--Check, if the input of account number is less than or equals to 10, continue the process
                 if (accountNumber.Length <= 10)
                 {
+                    //--Try to parse it to integer to make sure it is numeric 
                     if (int.TryParse(accountNumber, out result))
                     {
                         AccountNumber = result;
                     }
+                    //--If not numeric, show message
                     else
                     {
                         Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -444,6 +449,7 @@ namespace Bank_App
                         continue;
                     }
                 }
+                //--If more than 10 digit, show message
                 else
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -453,23 +459,25 @@ namespace Bank_App
                     Console.ReadKey();
                     continue;
                 }
-
+                //--Try to search the account
                 if (File.Exists("../../../Accounts/" + AccountNumber + ".txt"))
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
                     Console.WriteLine("Account found");
-
+                    //--Try to read the file data
                     try
                     {
                         StreamReader accountFile = new StreamReader("../../../Accounts/" + AccountNumber + ".txt");
                         String data = accountFile.ReadLine();
                         ArrayList dataPool = new ArrayList();
+                        //--Get the file data and save it temporary to and datapool arrayList
                         while (data != null)
                         {
                             string[] dataRow = data.Split('|');
                             dataPool.Add(dataRow[1]);
                             data = accountFile.ReadLine();
                         }
+                        //--Assign the class properties with the file data on the datapool
                         Firstname = dataPool[0].ToString();
                         Lastname = dataPool[1].ToString();
                         Address = dataPool[2].ToString();
@@ -478,12 +486,16 @@ namespace Bank_App
                         AccountNumber = int.Parse(dataPool[5].ToString());
                         Balance = int.Parse(dataPool[6].ToString());
 
+
+                        //--This is variable to indicate the width of the user interface
                         int whiteSpaceLeft = 51;
 
+                        //--Show the account details
                         Console.WriteLine("\t ====================================================");
                         Console.WriteLine("\t |                  ACCOUNT DETAILS                 |");
                         Console.WriteLine("\t |                                                  |");
                         Console.Write("\t | Firstname: " + Firstname);
+                        //--Adjust the width size
                         whiteSpaceLeft -= (Firstname.Length + 13);
                         for (int i = 0; i < whiteSpaceLeft; i++)
                         {
@@ -547,9 +559,10 @@ namespace Bank_App
                         Console.WriteLine(" ");
                         Console.WriteLine("\t ====================================================");
 
-                        //--Close the stream
+                        //--Close the file stream
                         accountFile.Close();
 
+                        //--Get the user's command
                         bool isValidCommand = false;
                         while (!isValidCommand)
                         {
@@ -557,16 +570,19 @@ namespace Bank_App
                             Console.WriteLine("\t |                                                  |");
                             Console.SetCursorPosition(commandCursorY, commandCursorX);
                             string command = Console.ReadLine();
+                            //--If yes, search another account
                             if (command.ToLower() == "y")
                             {
                                 isValidCommand = true;
                                 continue;
                             }
+                            //--If no, close this function and back to the main menu
                             else if (command.ToLower() == "n")
                             {
                                 isValidCommand = true;
                                 isValid = true;
                             }
+                            //--other than yes or no, show message that should be only "y" or "n" input
                             else
                             {
                                 Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
@@ -594,11 +610,10 @@ namespace Bank_App
                     }
                     continue;
                 }
+                //--If the file is not exist, show the message
                 else
                 {
-
                     isValid = false;
-
                     Console.WriteLine("\t |                                                  |");
                     Console.WriteLine("\t ====================================================");
                     Console.Write("\t | Account is not found, try another? (y/n):");
@@ -617,17 +632,20 @@ namespace Bank_App
                         Console.WriteLine("\t |                                                  |");
                         Console.SetCursorPosition(commandCursorY, commandCursorX);
                         string command = Console.ReadLine();
+                        //--If yes, search another account
                         if (command.ToLower() == "y")
                         {
                             isValidCommand = true;
                             continue;
                                
                         }
-                        else if(command.ToLower() == "n")
+                        //--If no, close this function and back to the main menu
+                        else if (command.ToLower() == "n")
                         {
                             isValidCommand = true;
                             isValid = true;
                         }
+                        //--other than yes or no, show message that should be only "y" or "n" input
                         else
                         {
                             Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
@@ -1842,19 +1860,22 @@ namespace Bank_App
                                 try
                                 {
                                     File.Delete("../../../Accounts/" + AccountNumber + ".txt");
-                                    isValidCommand = true;
                                     Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
                                     Console.Write(new string(' ', Console.WindowWidth));
                                     Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
                                     Console.WriteLine("\t | Account is delete                                |");
                                     Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                    isValid = true;
+
+                                    isValidCommand = true;
                                     Console.ReadKey();
-                                    continue;
                                 }
                                 catch (Exception e)
                                 {
                                     Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
                                     Console.WriteLine("\t | Failed to delete                                 |");
+                                    isValidCommand = true;
+                                    isValid = true;
                                     Console.ReadKey();
                                 }
                                 

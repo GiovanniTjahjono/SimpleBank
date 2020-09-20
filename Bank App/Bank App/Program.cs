@@ -131,6 +131,10 @@ namespace Bank_App
                     int choiceCursorX = Console.CursorTop;
                     int choiceCursorY = Console.CursorLeft;
                     Console.WriteLine("                      |");
+                    Console.Write("\t |   ");
+                    int messageCursorX = Console.CursorTop;
+                    int messageCursorY = Console.CursorLeft;
+                    Console.WriteLine("                                               |");
                     Console.WriteLine("\t ====================================================");
                     Console.SetCursorPosition(choiceCursorY, choiceCursorX);
                     string inputChoice = Console.ReadLine();
@@ -169,13 +173,19 @@ namespace Bank_App
                         }
                         else
                         {
-                            Console.WriteLine("please only input 1 - 7");
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.Write(new string(' ', 40));
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.Write("please only input 1 - 7");
                             Console.ReadKey();
                         }
                     }
                     else
                     {
-                        Console.WriteLine("please only input 1 - 7");
+                        Console.SetCursorPosition(messageCursorY, messageCursorX);
+                        Console.Write(new string(' ', 40));
+                        Console.SetCursorPosition(messageCursorY, messageCursorX);
+                        Console.Write("please only input 1 - 7");
                         Console.ReadKey();
                     }
                 }
