@@ -1,0 +1,7 @@
+Firstname|jiasd
+Lastname|asdioj
+Address|ijasd
+Phone|324
+Email|aisdj@gmail.com
+AccountNo|88110258
+Balance|0

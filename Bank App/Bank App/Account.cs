@@ -10,15 +10,18 @@ namespace Bank_App
 {
     class Account
     {
+        //--Declare variable regarding to the account detail
         private string firstname, lastname, address, email;
         private int phone, accountNumber, balance;
         private List<String> bankStatement = new List<string>();
+        
+        //--Bank statement list for email
+        private List<String> bankStatementToEmail = new List<string>();
 
-        public Account()
-        {
+        //--Default Constructor
+        public Account() {}
 
-        }
-
+        //--Getter and Setter
         public string Firstname { get => firstname; set => firstname = value; }
         public string Lastname { get => lastname; set => lastname = value; }
         public string Address { get => address; set => address = value; }
@@ -28,19 +31,25 @@ namespace Bank_App
         public List<string> BankStatement { get => bankStatement; set => bankStatement = value; }
         public int Balance { get => balance; set => balance = value; }
 
+        //--Generate unique account number
         public int GenerateUniqueAccountNumber()
         {
+            //--Declare Random() function and variables
             Random random = new Random();
             string accountNumber = "";
+            //--Check if the account number is valid (not exist yet)
             bool accountNumberIsValid = false;
             while (!accountNumberIsValid)
             {
                 accountNumber = "";
+                //--Generate 8 digit account number
                 for (int i = 0; i < 8; i++)
                 {
+                    //--Get number between 0 to 9
                     accountNumber += random.Next(0, 9);
                 }
-                if (File.Exists("../../../Accounts/" + accountNumber + ".txt"))
+                //--Check, if account number is already exist or the account is began with 0, return false and generate new account number
+                if (File.Exists("../../../Accounts/" + accountNumber + ".txt") || accountNumber.Substring(0,1) == "0")
                 {
                     continue;
                 } else
@@ -48,14 +57,16 @@ namespace Bank_App
                     accountNumberIsValid = true;
                 }
             }
-
+            //--Return the account number
             return int.Parse(accountNumber);
         }
 
+        //--Email format checker
         public bool isEmailValid(string email)
         {
             try
             {
+                //--If the email is match the regex, return true
                 return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(200));
             }
             catch (RegexMatchTimeoutException)
@@ -64,21 +75,74 @@ namespace Bank_App
             }
         }
 
-        public string SendingEmail(string reciever, string subject, string messageType)
+        //--Sending email function
+        //--Reciever = email destination
+        //--subject = email's subject
+        //--messageType = type of email (create new account or account statement)
+        public bool SendingEmail(string reciever, string subject, string messageType)
         {
+            //--Declare the messagae body
             string messageBody = "";
             switch (messageType)
             {
+                //--If want to send email about creating new account
                 case "createNewAccount":
                     messageBody = @"<html>" +
                                    "<body>" +
                                        "<p>Dear " + Firstname + "</p>" +
                                        "<p>Thank you for opening new account on Simple Bank. here it is your detail account</p> " +
+                                       "<p><strong>Account Number: </strong>" + AccountNumber + "</p>" +
                                        "<p><strong>Firstname: </strong>" + Firstname + "</p>" +
                                        "<p><strong>Lastname: </strong>" + Lastname + "</p>" +
                                        "<p><strong>Address: </strong>" + Address + "</p>" +
+                                       "<p><strong>Phone: </strong>" + Phone + "</p>" +
+                                       "<p><strong>Email: </strong>" + Email + "</p>" +
+                                       "<p>Please do not hesitate to contact us if there is any issues" +
+                                       "<br>" +
+                                       "<br>" +
+                                       "<p>Sincerely,</p>" +
+                                       "<p>Head of Customer Relationship</p>" +
+                                       "<p>Giovanni Tjahjono</p>" +
+                                   "</body>" +
+                                "</html>";
+                    break;
+                //--If want to send email about account statement
+                case "Account Statement":
+                    string accountStatementTable = "";
+                    for(int i = 0; i < bankStatementToEmail.Count; i++)
+                    {
+                        string[] arrayData;
+                        arrayData = bankStatementToEmail[i].Split("|");
+                        accountStatementTable += "<tr>";
+                        accountStatementTable += "<td>" + arrayData[0] + "</td>";
+                        accountStatementTable += "<td>" + arrayData[1] + "</td>";
+                        accountStatementTable += "<td style='text-align:right'>$" + arrayData[2] + "</td>";
+                        accountStatementTable += "<td style='text-align:right'>$" + arrayData[3] + "</td>";
+                        accountStatementTable += "</tr>";
+                    }
+
+                    bankStatementToEmail.Clear();
+                    messageBody = @"<html>" +
+                                   "<body>" +
+                                       "<p>Dear " + Firstname + "</p>" +
+                                       "<p>Here it is your detail account</p> " +
+                                       "<p><strong>Account Number: </strong>" + AccountNumber + "</p>" +
                                        "<p><strong>Firstname: </strong>" + Firstname + "</p>" +
-                                       "<p><strong>Firstname: </strong>" + Firstname + "</p>" +
+                                       "<p><strong>Lastname: </strong>" + Lastname + "</p>" +
+                                       "<p><strong>Address: </strong>" + Address + "</p>" +
+                                       "<p><strong>Phone: </strong>" + Phone + "</p>" +
+                                       "<p><strong>Email: </strong>" + Email + "</p>" +
+                                       "<br>" +
+                                       "<p>This is your transaction details</p>" +
+                                       "<table border='1'>" +
+                                            "<tr>" +
+                                                "<th>Date</th>" +
+                                                "<th>Transaction</th>" +
+                                                "<th>Amount</th>" +
+                                                "<th>Balance</th>" +
+                                            "</tr>" + 
+                                            accountStatementTable +
+                                       "</table>" +
                                        "<p>Please do not hesitate to contact us if there is any issues" +
                                        "<br>" +
                                        "<br>" +
@@ -93,34 +157,41 @@ namespace Bank_App
             }
             try
             {
-                MailAddress emailFrom = new MailAddress("simplebankuts@gmail.com", "13389984");
-                
+                //--Declare the Mail function
                 MailMessage email = new MailMessage();
                 SmtpClient server = new SmtpClient("smtp.gmail.com");
 
+                //--Setup the email structure
                 email.From = new MailAddress("ivankissling@gmail.com");
                 email.To.Add(reciever);
                 email.Subject = subject;
                 email.IsBodyHtml = true;
                 email.Body = messageBody;
                 
+                //--Send the email
                 server.Port = 587;
                 server.Credentials = new System.Net.NetworkCredential("simplebankuts@gmail.com", "13389984");
                 server.EnableSsl = true;
                 server.Send(email);
-                return "sukses";
+
+                //--If success, return true
+                return true;
             }
             catch(Exception e)
             {
-                return e.Message;
+                //--If failed, return false
+                return false;
             }
         }
 
+        //--Generate new account
         public void CreateNewAccount()
         {
+            //--as long as isValid active, means show the create new account menu
             bool isValid = false;
             while(!isValid)
             {
+                //--Show the interface
                 Console.Clear();
                 Console.WriteLine("\t ====================================================");
                 Console.WriteLine("\t |                                                  |");
@@ -161,8 +232,10 @@ namespace Bank_App
                 Console.WriteLine("                                                 |");
                 Console.WriteLine("\t ====================================================");
 
+                //--Firstname input
                 Console.SetCursorPosition(firstnameCursorY, firstnameCursorX);
                 Firstname = Console.ReadLine();
+                //--if there's no input, show message that the user should input at least a character
                 if(Firstname == "")
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -172,8 +245,11 @@ namespace Bank_App
                     Console.ReadKey();
                     continue;
                 }
+
+                //--Lastname input
                 Console.SetCursorPosition(lastnameCursorY, lastnameCursorX);
                 Lastname = Console.ReadLine();
+                //--if there's no input, show message that the user should input at least a character
                 if (Lastname == "")
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -183,8 +259,11 @@ namespace Bank_App
                     Console.ReadKey();
                     continue;
                 }
+
+                //--Address input
                 Console.SetCursorPosition(addressCursorY, addressCursorX);
                 Address = Console.ReadLine();
+                //--if there's no input, show message that the user should input at least a character
                 if (Address == "")
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -194,12 +273,16 @@ namespace Bank_App
                     Console.ReadKey();
                     continue;
                 }
+
+                //--Phone input
                 Console.SetCursorPosition(phoneCursorY, phoneCursorX);
                 int phone;
+                //--Check, the input should be numeric
                 if (int.TryParse(Console.ReadLine(), out phone))
                 {
                     Phone = phone;
                 }
+                //--if not numeric, show message that the user should input numeric
                 else
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
@@ -209,9 +292,12 @@ namespace Bank_App
                     Console.ReadKey();
                     continue;
                 }
+
+                //--Email input
                 Console.SetCursorPosition(emailCursorY, emailCursorX);
                 Email = Console.ReadLine();
-                if(!isEmailValid(Email))
+                //--if the email format is not right, show message that the user should input the right email format
+                if (!isEmailValid(Email))
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
                     Console.WriteLine("Please input the right email format xxx@xxx.xxx");
@@ -221,18 +307,25 @@ namespace Bank_App
                     continue;
                 }
 
+                //--Confirmation
                 bool isCorrect = false;
                 while(!isCorrect)
                 {
                     Console.SetCursorPosition(messageCursorY, messageCursorX);
-                    Console.Write("Is the information correct? (y/n)");
+                    Console.Write("Is the information correct? (y/n):");
                     string confirm = Console.ReadLine();
+                    
+                    //--If the user has agree and type "y"
                     if(confirm.ToLower() == "y")
                     {
+                        //--set true to make this function does not loop again
                         isCorrect = true;
                         isValid = true;
                         
+                        //--Generate account number
                         AccountNumber = GenerateUniqueAccountNumber();
+
+                        //--Save the detail user into a file
                         try
                         {
                             File.WriteAllText("../../../Accounts/"+AccountNumber + ".txt", "Firstname|" + Firstname + "\n" +
@@ -249,22 +342,43 @@ namespace Bank_App
                             Console.SetCursorPosition(messageCursorY, messageCursorX);
                             Console.Write(e.Message);
                         }
-
-                        SendingEmail(Email, "New Account is Created", "a");
+                        //--Show message please wait until the operation is finished
                         Console.SetCursorPosition(messageCursorY, messageCursorX);
-                        Console.Write(new string(' ', Console.WindowWidth));
-                        Console.SetCursorPosition(messageCursorY, messageCursorX);
-                        Console.Write("Account is created, check email for the detail");
-                        Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
-                        Console.Write(new string(' ', Console.WindowWidth));
-                        Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
-                        Console.Write("Account number is " + accountNumber);
+                        Console.WriteLine("Creating account, please wait...                 |");
 
-                        Console.ReadLine();
-                    } else if (confirm.ToLower() == "n")
+                        //--If email is managed to be sent, show message success
+                        if (SendingEmail(Email, "New Account is Created", "createNewAccount"))
+                        {
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.WriteLine("Account is created, check email for the detail   |");
+                            Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                            Console.WriteLine("Account number is " + accountNumber);
+
+                            Console.ReadLine();
+                        }
+                        //--Show failed if the operation is failed
+                        else
+                        {
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.Write(new string(' ', 24));
+                            Console.SetCursorPosition(messageCursorY, messageCursorX);
+                            Console.Write("Failed to create account");
+                            Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                            Console.Write(new string(' ', 24));
+                            Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                            Console.Write("Try again");
+                            Console.ReadLine();
+                        }
+                        
+                       
+                    }
+                    //--If the user want to change the detail, loop again
+                    else if (confirm.ToLower() == "n")
                     {
                         isCorrect = true;
-                    } else
+                    }
+                    //--If user input other than "y" or "n"
+                    else
                     {
                         Console.SetCursorPosition(messageCursorY, messageCursorX);
                         Console.Write("Please input only 'y' for yes or 'n' for no ");
@@ -272,18 +386,16 @@ namespace Bank_App
                         Console.WriteLine("Press any key to try again");
                         Console.ReadKey();
                         Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
-                        Console.Write(new string(' ', Console.WindowWidth));
+                        Console.Write(new string(' ', 26));
                         Console.SetCursorPosition(messageCursorY, messageCursorX);
-                        Console.Write(new string(' ', Console.WindowWidth));
+                        Console.Write(new string(' ', 44));
                         continue;
                     }
                 }
-               
-
             }
-           
         }
 
+        //--Search an account
         public void SearchAnAccount()
         {
             bool isValid = false;
@@ -445,20 +557,15 @@ namespace Bank_App
                             Console.WriteLine("\t |                                                  |");
                             Console.SetCursorPosition(commandCursorY, commandCursorX);
                             string command = Console.ReadLine();
-                            if (command.ToLower() == "y" || command.ToLower() == "n")
+                            if (command.ToLower() == "y")
                             {
                                 isValidCommand = true;
-                                switch (command.ToLower())
-                                {
-                                    case "y":
-                                        continue;
-                                    case "n":
-                                        isValid = true;
-                                        break;
-                                    default:
-                                        isValid = true;
-                                        break;
-                                }
+                                continue;
+                            }
+                            else if (command.ToLower() == "n")
+                            {
+                                isValidCommand = true;
+                                isValid = true;
                             }
                             else
                             {
@@ -489,19 +596,62 @@ namespace Bank_App
                 }
                 else
                 {
-                    Console.SetCursorPosition(messageCursorY, messageCursorX);
-                    Console.WriteLine("Account is not found, check the account number");
-                    Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
-                    Console.WriteLine("Press any key to try again");
+
                     isValid = false;
-                    Console.ReadKey();
-                    continue;
+
+                    Console.WriteLine("\t |                                                  |");
+                    Console.WriteLine("\t ====================================================");
+                    Console.Write("\t | Account is not found, try another? (y/n):");
+                    int commandCursorY = Console.CursorLeft;
+                    int commandCursorX = Console.CursorTop;
+                    Console.WriteLine(" ");
+                    int messageCommandCursorY = Console.CursorLeft;
+                    int messageCommandCursorX = Console.CursorTop;
+                    Console.WriteLine(" ");
+                    Console.WriteLine("\t ====================================================");
+
+                    bool isValidCommand = false;
+                    while (!isValidCommand)
+                    {
+                        Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                        Console.WriteLine("\t |                                                  |");
+                        Console.SetCursorPosition(commandCursorY, commandCursorX);
+                        string command = Console.ReadLine();
+                        if (command.ToLower() == "y")
+                        {
+                            isValidCommand = true;
+                            continue;
+                               
+                        }
+                        else if(command.ToLower() == "n")
+                        {
+                            isValidCommand = true;
+                            isValid = true;
+                        }
+                        else
+                        {
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("\t | Please input 'Y' for Yes or 'N' for No !         |");
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.ReadKey();
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("                                                  |");
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            Console.WriteLine("        |");
+                            continue;
+                        }
+                    }
                 }
-
-
             }
         }
 
+        //--Deposit
         public void Deposit()
         {
             //--Declare a var as a indicator of the function is still valid (active) or not
@@ -834,6 +984,7 @@ namespace Bank_App
             }
         }
 
+        //--Withdrawal
         public void Withdrawal()
         {
             //--Declare a var as a indicator of the function is still valid (active) or not
@@ -1166,7 +1317,364 @@ namespace Bank_App
             }
         }
 
+        //--Account statement
         public void AccountStatement()
+        {
+            bool isValid = false;
+            while (!isValid)
+            {
+                //--Clear the bank statement from the previous operation
+                BankStatement.Clear();
+
+                Console.Clear();
+                Console.WriteLine("\t ====================================================");
+                Console.WriteLine("\t |                                                  |");
+                Console.WriteLine("\t |                 ACCOUNT STATEMENT                |");
+                Console.WriteLine("\t |                                                  |");
+                Console.WriteLine("\t ====================================================");
+                Console.WriteLine("\t |                 ENTER THE DETAILS                |");
+                Console.WriteLine("\t |                                                  |");
+                Console.Write("\t |   Account Number: ");
+                int accountNumberCursorX = Console.CursorTop;
+                int accountNumberCursorY = Console.CursorLeft;
+                Console.WriteLine("                               |");
+                Console.WriteLine("\t |                                                  |");
+                Console.WriteLine("\t ====================================================");
+                Console.Write("\t | ");
+                int messageCursorX = Console.CursorTop;
+                int messageCursorY = Console.CursorLeft;
+                Console.WriteLine("                                                 |");
+                Console.Write("\t | ");
+                int messageSecondCursorX = Console.CursorTop;
+                int messageSecondCursorY = Console.CursorLeft;
+                Console.WriteLine("                                                 |");
+                Console.WriteLine("\t ====================================================");
+
+                Console.SetCursorPosition(accountNumberCursorY, accountNumberCursorX);
+                string accountNumber = Console.ReadLine();
+                int result = 0;
+                if (accountNumber.Length <= 10)
+                {
+                    if (int.TryParse(accountNumber, out result))
+                    {
+                        AccountNumber = result;
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(messageCursorY, messageCursorX);
+                        Console.WriteLine("Please input numeric character");
+                        Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                        Console.WriteLine("Press any key to try again");
+                        Console.ReadKey();
+                        continue;
+                    }
+                }
+                else
+                {
+                    Console.SetCursorPosition(messageCursorY, messageCursorX);
+                    Console.WriteLine("Please input maximum 10 character");
+                    Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
+                    Console.WriteLine("Press any key to try again");
+                    Console.ReadKey();
+                    continue;
+                }
+
+                if (File.Exists("../../../Accounts/" + AccountNumber + ".txt"))
+                {
+                    Console.SetCursorPosition(messageCursorY, messageCursorX);
+                    Console.WriteLine("Account found");
+
+                    try
+                    {
+                        StreamReader accountFile = new StreamReader("../../../Accounts/" + AccountNumber + ".txt");
+                        String data = accountFile.ReadLine();
+                        ArrayList dataPool = new ArrayList();
+                        //--Declare a variable to knowing the end line of the account detail file
+                        bool isEndLineOfAccountDetail = false;
+                        while (data != null)
+                        {
+                            if(!isEndLineOfAccountDetail)
+                            {
+                                //--Split the data 
+                                string[] dataRow = data.Split('|');
+                                //--Take only the data without the data label
+                                dataPool.Add(dataRow[1]);
+
+                                //--If the current line is "Balance", it means the end of the line and the next line is the bank statement
+                                if (dataRow[0].ToLower() == "balance")
+                                {
+                                    isEndLineOfAccountDetail = true;
+                                }
+
+                                //--Read the data
+                                data = accountFile.ReadLine();
+                            }
+                            //--Add the bank statement to the list
+                            else
+                            {
+                                BankStatement.Add(data);
+                                //--Read the data
+                                data = accountFile.ReadLine();
+                            }
+
+                        }
+                        Firstname = dataPool[0].ToString();
+                        Lastname = dataPool[1].ToString();
+                        Address = dataPool[2].ToString();
+                        Phone = int.Parse(dataPool[3].ToString());
+                        Email = dataPool[4].ToString();
+                        AccountNumber = int.Parse(dataPool[5].ToString());
+                        Balance = int.Parse(dataPool[6].ToString());
+
+                        int whiteSpaceLeft = 51;
+
+                        Console.WriteLine("\t ====================================================");
+                        Console.WriteLine("\t |                  ACCOUNT DETAILS                 |");
+                        Console.WriteLine("\t |                                                  |");
+                        Console.Write("\t | Firstname: " + Firstname);
+                        whiteSpaceLeft -= (Firstname.Length + 13);
+                        for (int i = 0; i < whiteSpaceLeft; i++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.WriteLine("|");
+                        whiteSpaceLeft = 50;
+
+                        Console.Write("\t | Lastname: " + Lastname);
+                        whiteSpaceLeft -= (Lastname.Length + 11);
+                        for (int i = 0; i < whiteSpaceLeft; i++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.WriteLine("|");
+                        whiteSpaceLeft = 50;
+
+                        Console.Write("\t | Address: " + Address);
+                        whiteSpaceLeft -= (Address.Length + 10);
+                        for (int i = 0; i < whiteSpaceLeft; i++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.WriteLine("|");
+                        whiteSpaceLeft = 50;
+
+                        Console.Write("\t | Phone: " + Phone);
+                        whiteSpaceLeft -= (Phone.ToString().Length + 8);
+                        for (int i = 0; i < whiteSpaceLeft; i++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.WriteLine("|");
+                        whiteSpaceLeft = 50;
+
+                        Console.Write("\t | Email: " + Email);
+                        whiteSpaceLeft -= (Email.Length + 8);
+                        for (int i = 0; i < whiteSpaceLeft; i++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.WriteLine("|");
+                        whiteSpaceLeft = 50;
+
+                        Console.Write("\t | Balance: $" + Balance);
+                        whiteSpaceLeft -= (Balance.ToString().Length + 11);
+                        for (int i = 0; i < whiteSpaceLeft; i++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.WriteLine("|");
+                        whiteSpaceLeft = 50;
+
+                        Console.WriteLine("\t |                                                  |");
+                        Console.WriteLine("\t ====================================================");
+                        Console.WriteLine("\t |                LAST 5 TRANSACTIONS               |");
+                        Console.WriteLine("\t |                                                  |");
+
+                        if(BankStatement.Count >= 5)
+                        {
+                            for (int i = BankStatement.Count - 1; i >= BankStatement.Count - 5; i--)
+                            {
+                                bankStatementToEmail.Add(bankStatement[i]);
+                                Console.Write("\t | " + BankStatement[i]);
+                                whiteSpaceLeft -= (BankStatement[i].Length + 1);
+                                for (int j = 0; j < whiteSpaceLeft; j++)
+                                {
+                                    Console.Write(" ");
+                                }
+                                Console.WriteLine("|");
+                                whiteSpaceLeft = 50;
+                            }
+                        }
+                        else if(BankStatement.Count > 0 && BankStatement.Count < 5)
+                        {
+                            for (int i = BankStatement.Count - 1; i >= 0; i--)
+                            {
+                                bankStatementToEmail.Add(bankStatement[i]);
+                                Console.Write("\t | " + BankStatement[i]);
+                                whiteSpaceLeft -= (BankStatement[i].Length + 1);
+                                for (int j = 0; j < whiteSpaceLeft; j++)
+                                {
+                                    Console.Write(" ");
+                                }
+                                Console.WriteLine("|");
+                                whiteSpaceLeft = 50;
+                            }
+                        }
+                        else
+                        {
+                            Console.Write("\t | There is no transactions record");
+                            whiteSpaceLeft -= 32;
+                            for (int j = 0; j < whiteSpaceLeft; j++)
+                            {
+                                Console.Write(" ");
+                            }
+                            Console.WriteLine("|");
+                            whiteSpaceLeft = 50;
+                        }
+                       
+
+                        Console.WriteLine("\t |                                                  |");
+                        Console.WriteLine("\t ====================================================");
+                        Console.Write("\t | Email this transaction? (y/n):");
+                        int commandCursorY = Console.CursorLeft;
+                        int commandCursorX = Console.CursorTop;
+                        Console.WriteLine("                   |");
+                        int messageCommandCursorY = Console.CursorLeft;
+                        int messageCommandCursorX = Console.CursorTop;
+                        Console.WriteLine(" ");
+                        Console.WriteLine("\t ====================================================");
+
+                        //--Close the stream
+                        accountFile.Close();
+
+                        bool isValidCommand = false;
+                        while (!isValidCommand)
+                        {
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("\t |                                                  |");
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            string command = Console.ReadLine();
+                            if (command.ToLower() == "y" || command.ToLower() == "n")
+                            {
+                                isValidCommand = true;
+                                switch (command.ToLower())
+                                {
+                                    case "y":
+                                        Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                        Console.Write(new string(' ', Console.WindowWidth));
+                                        Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                        Console.WriteLine("\t | Sending email, please wait...                    |");
+                                        if (SendingEmail(Email, "Account Statement", "Account Statement"))
+                                        {
+                                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                            Console.Write(new string(' ', Console.WindowWidth));
+                                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                            Console.WriteLine("\t | Email is sent, check your email                  |");
+                                        } 
+                                        else
+                                        {
+                                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                            Console.WriteLine("\t | Failed to send email, try again                  |");
+                                        }
+                                        isValid = true;
+                                        Console.ReadKey();
+                                        continue;
+                                    case "n":
+                                        isValid = true;
+                                        break;
+                                    default:
+                                        isValid = true;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                Console.Write(new string(' ', Console.WindowWidth));
+                                Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                Console.WriteLine("\t | Please input 'Y' for Yes or 'N' for No !         |");
+                                Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                Console.ReadKey();
+                                Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                Console.Write(new string(' ', Console.WindowWidth));
+                                Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                Console.WriteLine("                                                  |");
+                                Console.SetCursorPosition(commandCursorY, commandCursorX);
+                                Console.Write(new string(' ', Console.WindowWidth));
+                                Console.SetCursorPosition(commandCursorY, commandCursorX);
+                                Console.WriteLine("                   |");
+                                continue;
+                            }
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message);
+                        Console.ReadKey();
+                    }
+                    continue;
+                }
+                else
+                {
+
+                    isValid = false;
+
+                    Console.WriteLine("\t |                                                  |");
+                    Console.WriteLine("\t ====================================================");
+                    Console.Write("\t | Account is not found, try another? (y/n):");
+                    int commandCursorY = Console.CursorLeft;
+                    int commandCursorX = Console.CursorTop;
+                    Console.WriteLine(" ");
+                    int messageCommandCursorY = Console.CursorLeft;
+                    int messageCommandCursorX = Console.CursorTop;
+                    Console.WriteLine(" ");
+                    Console.WriteLine("\t ====================================================");
+
+                    bool isValidCommand = false;
+                    while (!isValidCommand)
+                    {
+                        Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                        Console.WriteLine("\t |                                                  |");
+                        Console.SetCursorPosition(commandCursorY, commandCursorX);
+                        string command = Console.ReadLine();
+                        if (command.ToLower() == "y")
+                        {
+                            isValidCommand = true;
+                            continue;
+
+                        }
+                        else if (command.ToLower() == "n")
+                        {
+                            isValidCommand = true;
+                            isValid = true;
+                        }
+                        else
+                        {
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("\t | Please input 'Y' for Yes or 'N' for No !         |");
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.ReadKey();
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("                                                  |");
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            Console.WriteLine("        |");
+                            continue;
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        //--Delete
+        public void Delete()
         {
             bool isValid = false;
             while (!isValid)
@@ -1174,7 +1682,7 @@ namespace Bank_App
                 Console.Clear();
                 Console.WriteLine("\t ====================================================");
                 Console.WriteLine("\t |                                                  |");
-                Console.WriteLine("\t |                 ACCOUNT STATEMENT                |");
+                Console.WriteLine("\t |                 DELETE AN ACCOUNT                |");
                 Console.WriteLine("\t |                                                  |");
                 Console.WriteLine("\t ====================================================");
                 Console.WriteLine("\t |                 ENTER THE DETAILS                |");
@@ -1253,6 +1761,7 @@ namespace Bank_App
                         Console.WriteLine("\t ====================================================");
                         Console.WriteLine("\t |                  ACCOUNT DETAILS                 |");
                         Console.WriteLine("\t |                                                  |");
+
                         Console.Write("\t | Firstname: " + Firstname);
                         whiteSpaceLeft -= (Firstname.Length + 13);
                         for (int i = 0; i < whiteSpaceLeft; i++)
@@ -1309,28 +1818,10 @@ namespace Bank_App
 
                         Console.WriteLine("\t |                                                  |");
                         Console.WriteLine("\t ====================================================");
-                        Console.WriteLine("\t |                LAST 5 TRANSACTIONS               |");
-                        Console.WriteLine("\t |                                                  |");
-
-
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Console.Write("\t | Email: " + Email);
-                            whiteSpaceLeft -= (Email.Length + 8);
-                            for (int j = 0; j < whiteSpaceLeft; j++)
-                            {
-                                Console.Write(" ");
-                            }
-                            Console.WriteLine("|");
-                            whiteSpaceLeft = 50;
-                        }
-
-                        Console.WriteLine("\t |                                                  |");
-                        Console.WriteLine("\t ====================================================");
-                        Console.Write("\t | Do you want to search another account? (y/n):");
+                        Console.Write("\t | Are you sure want to delete account? (y/n):");
                         int commandCursorY = Console.CursorLeft;
                         int commandCursorX = Console.CursorTop;
-                        Console.WriteLine("    |");
+                        Console.WriteLine("      |");
                         int messageCommandCursorY = Console.CursorLeft;
                         int messageCommandCursorX = Console.CursorTop;
                         Console.WriteLine(" ");
@@ -1346,20 +1837,32 @@ namespace Bank_App
                             Console.WriteLine("\t |                                                  |");
                             Console.SetCursorPosition(commandCursorY, commandCursorX);
                             string command = Console.ReadLine();
-                            if (command.ToLower() == "y" || command.ToLower() == "n")
+                            if (command.ToLower() == "y")
+                            {
+                                try
+                                {
+                                    File.Delete("../../../Accounts/" + AccountNumber + ".txt");
+                                    isValidCommand = true;
+                                    Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                    Console.Write(new string(' ', Console.WindowWidth));
+                                    Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                    Console.WriteLine("\t | Account is delete                                |");
+                                    Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                    Console.ReadKey();
+                                    continue;
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                                    Console.WriteLine("\t | Failed to delete                                 |");
+                                    Console.ReadKey();
+                                }
+                                
+                            }
+                            else if (command.ToLower() == "n")
                             {
                                 isValidCommand = true;
-                                switch (command.ToLower())
-                                {
-                                    case "y":
-                                        continue;
-                                    case "n":
-                                        isValid = true;
-                                        break;
-                                    default:
-                                        isValid = true;
-                                        break;
-                                }
+                                isValid = true;
                             }
                             else
                             {
@@ -1390,16 +1893,58 @@ namespace Bank_App
                 }
                 else
                 {
-                    Console.SetCursorPosition(messageCursorY, messageCursorX);
-                    Console.WriteLine("Account is not found, check the account number");
-                    Console.SetCursorPosition(messageSecondCursorY, messageSecondCursorX);
-                    Console.WriteLine("Press any key to try again");
+
                     isValid = false;
-                    Console.ReadKey();
-                    continue;
+
+                    Console.WriteLine("\t |                                                  |");
+                    Console.WriteLine("\t ====================================================");
+                    Console.Write("\t | Account is not found, try another? (y/n):");
+                    int commandCursorY = Console.CursorLeft;
+                    int commandCursorX = Console.CursorTop;
+                    Console.WriteLine(" ");
+                    int messageCommandCursorY = Console.CursorLeft;
+                    int messageCommandCursorX = Console.CursorTop;
+                    Console.WriteLine(" ");
+                    Console.WriteLine("\t ====================================================");
+
+                    bool isValidCommand = false;
+                    while (!isValidCommand)
+                    {
+                        Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                        Console.WriteLine("\t |                                                  |");
+                        Console.SetCursorPosition(commandCursorY, commandCursorX);
+                        string command = Console.ReadLine();
+                        if (command.ToLower() == "y")
+                        {
+                            isValidCommand = true;
+                            continue;
+
+                        }
+                        else if (command.ToLower() == "n")
+                        {
+                            isValidCommand = true;
+                            isValid = true;
+                        }
+                        else
+                        {
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("\t | Please input 'Y' for Yes or 'N' for No !         |");
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.ReadKey();
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(messageCommandCursorY, messageCommandCursorX);
+                            Console.WriteLine("                                                  |");
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            Console.Write(new string(' ', Console.WindowWidth));
+                            Console.SetCursorPosition(commandCursorY, commandCursorX);
+                            Console.WriteLine("        |");
+                            continue;
+                        }
+                    }
                 }
-
-
             }
         }
     }

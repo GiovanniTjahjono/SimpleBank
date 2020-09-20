@@ -1,7 +1,0 @@
-Firstname|Giovanni
-Lastname|Tjahjono
-Address|ivangiovn@gmail.com
-Phone|426807941
-Email|ivangiovn@gmail.com
-AccountNo|71678416
-Balance|0

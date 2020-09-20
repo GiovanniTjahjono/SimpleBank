@@ -1,0 +1,11 @@
+Firstname|Amanda
+Lastname|Burnwood
+Address|231 George Street, Sydney, NSW 2000
+Phone|28928932
+Email|ivanbrazcow03@gmail.com
+AccountNo|31240374
+Balance|605
+19/09/2020 15:56:11|Deposit|100|100
+19/09/2020 15:56:20|Deposit|450|550
+19/09/2020 15:56:29|Deposit|54|604
+19/09/2020 15:56:35|Deposit|1|605

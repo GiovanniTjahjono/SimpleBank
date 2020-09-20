@@ -1,0 +1,7 @@
+Firstname|Ardi
+Lastname|Kusuma
+Address|Jalan sana
+Phone|901238
+Email|ardi@gmail.com
+AccountNo|44736376
+Balance|0

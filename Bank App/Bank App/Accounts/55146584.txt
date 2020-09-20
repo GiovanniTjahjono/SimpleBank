@@ -4,4 +4,9 @@ Address|UTS Building 10, Sydney, NSW
 Phone|4268920
 Email|ivangiovn@gmail.com
 AccountNo|55146584
-Balance|0
+Balance|194
+19/09/2020 14:59:03|Deposit|120|120
+19/09/2020 14:59:11|Deposit|5|125
+19/09/2020 14:59:19|Deposit|80|205
+19/09/2020 14:59:26|Withdrawal|10|195
+19/09/2020 14:59:33|Withdrawal|1|194

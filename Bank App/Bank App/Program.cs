@@ -7,8 +7,6 @@ namespace Bank_App
         static void Main(string[] args)
         {
             bool credentialIsValid = false;
-            Account a = new Account();
-            a.AccountStatement();
             while (!credentialIsValid)
             {
                 Console.Clear();
@@ -37,7 +35,27 @@ namespace Bank_App
                 Console.SetCursorPosition(usernameCursorY, usernameCursorX);
                 String username = Console.ReadLine();
                 Console.SetCursorPosition(passwordCursorY, passwordCursorX);
-                String password = Console.ReadLine();
+                String password = "";
+                char passwordChar = '*';
+                bool isEnter = false;
+                while(!isEnter)
+                {
+                    var key = Console.ReadKey(intercept: true);
+                    if(key.Key == ConsoleKey.Backspace && password.Length > 0)
+                    {
+                        Console.Write("\b \b");
+                        password = password[0..^1];
+                    }
+                    if(!char.IsControl(key.KeyChar))
+                    {
+                        Console.Write(passwordChar);
+                        password += key.KeyChar;
+                    }
+                    if(key.Key == ConsoleKey.Enter)
+                    {
+                        isEnter = true;
+                    }
+                }
 
                 
 
@@ -72,15 +90,11 @@ namespace Bank_App
             bool isActive = true;
             while (isActive)
             {
-
-
-                //52 chars
-                bool inputChoiceIsValid = false;
                 int menuChoice = 0;
                 int lineBeforeAndAfterGreeting = (52 - (usernameLoginUser.Length + 4)) / 2 - 1;
                 int lineSpaceLeft = 52 - ((lineBeforeAndAfterGreeting * 2) + (usernameLoginUser.Length + 4 + 2));
 
-                while (!inputChoiceIsValid)
+                while (isActive)
                 {
                     Console.Clear();
                     Console.WriteLine("\t ====================================================");
@@ -122,44 +136,51 @@ namespace Bank_App
                     string inputChoice = Console.ReadLine();
                     if (int.TryParse(inputChoice, out menuChoice))
                     {
-                        if (menuChoice <= 7 || menuChoice >= 1)
+                        if (menuChoice <= 7 && menuChoice >= 1)
                         {
-                            inputChoiceIsValid = true;
+                            Account account = new Account();
+                            switch (menuChoice)
+                            {
+                                case 1:
+                                    account.CreateNewAccount();
+                                    break;
+                                case 2:
+                                    account.SearchAnAccount();
+                                    break;
+                                case 3:
+                                    account.Deposit();
+                                    break;
+                                case 4:
+                                    account.Withdrawal();
+                                    break;
+                                case 5:
+                                    account.AccountStatement();
+                                    break;
+                                case 6:
+                                    account.Delete();
+                                    break;
+                                case 7:
+                                    isActive = false;
+                                    break;
+                                default:
+                                    Environment.Exit(0);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("please only input 1 - 7");
+                            Console.ReadKey();
                         }
                     }
                     else
                     {
-                        Console.WriteLine("please input 1 - 7");
+                        Console.WriteLine("please only input 1 - 7");
+                        Console.ReadKey();
                     }
                 }
 
-                Account account = new Account();
-                switch (menuChoice)
-                {
-                    case 1:
-                        account.CreateNewAccount();
-                        break;
-                    case 2:
-                        account.SearchAnAccount();
-                        break;
-                    case 3:
-                        account.Deposit();
-                        break;
-                    case 4:
-                        account.Withdrawal();
-                        break;
-                    case 5:
-                        account.AccountStatement();
-                        break;
-                    case 6:
-                        break;
-                    case 7:
-                        isActive = false;
-                        break;
-                    default:
-                        Environment.Exit(0);
-                        break;
-                }
+               
             }
         }
     }

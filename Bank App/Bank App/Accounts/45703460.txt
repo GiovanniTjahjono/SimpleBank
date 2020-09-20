@@ -1,0 +1,7 @@
+Firstname|iadosj
+Lastname|asdij
+Address|asdij
+Phone|82913
+Email|asd@mg.com
+AccountNo|45703460
+Balance|0

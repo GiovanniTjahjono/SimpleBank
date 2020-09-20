@@ -1,0 +1,7 @@
+Firstname|jakdls
+Lastname|asd
+Address|aafsd
+Phone|3244235
+Email|asd@fmsdf.com
+AccountNo|25867876
+Balance|0

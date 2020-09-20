@@ -1,0 +1,7 @@
+Firstname|asd
+Lastname|asd
+Address|asd
+Phone|234
+Email|ads@gmail.com
+AccountNo|71673158
+Balance|0
